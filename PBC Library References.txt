@@ -1,0 +1,11 @@
+https://crypto.stanford.edu/pbc/manual/ch01.html
+
+http://gas.dia.unisa.it/projects/jpbc/docs/pairing.html#.WtY4v4hubDd
+
+http://gas.dia.unisa.it/projects/jpbc/java-docs/api/
+
+https://www.tutorialspoint.com/cryptography/index.htm
+
+https://www.di-mgt.com.au/crypto.html#links
+
+http://www.computersciencestudent.com/
