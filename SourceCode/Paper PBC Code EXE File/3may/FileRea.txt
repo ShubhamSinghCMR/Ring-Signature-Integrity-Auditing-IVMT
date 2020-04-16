@@ -1,0 +1,28 @@
+int i = 0, line = 5;
+  char ch[100];
+  FILE *myfile;
+    myfile = fopen("E:\mytest.txt","r");
+    if (myfile== NULL)
+    {
+    printf("can not open file \n");
+    return 1;
+    }
+
+    while(line--){
+    fscanf(myfile,"%s",&ch[i]);
+    i++;
+    printf("\n%s", &ch[i]);
+    }
+
+    fclose(myfile);
+
+    return 0;
+}
+for(int i = 0; i < 5; ++i)
+{
+  if(fgets(ln[i], sizeof ln[i], myfile) == NULL)
+  {
+    fprintf(stderr, "Read error on line %d\n", i);
+    exit(1);
+  }
+}

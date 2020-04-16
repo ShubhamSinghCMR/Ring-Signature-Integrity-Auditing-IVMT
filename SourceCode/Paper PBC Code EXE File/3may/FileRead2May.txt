@@ -1,0 +1,15 @@
+ int fileval = 0, line = 35;
+    FILE *file;
+    file = fopen("E:\Segmentaa.txt","r");
+    if (file== NULL)
+        {
+        printf("can not open file \n");
+        return 1;
+        }
+    char filetext[line][9000];
+    while(fgets(filetext[fileval], sizeof filetext[fileval], file)!= NULL)
+    {
+		printf("%s", filetext[fileval]);
+		fileval++;
+    }
+fclose(file);

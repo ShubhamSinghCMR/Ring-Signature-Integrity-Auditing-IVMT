@@ -1,0 +1,314 @@
+#include <pbc.h>
+#include <pbc_test.h>
+
+int main(int argc, char **argv)
+{
+int i,j;
+int q=100;
+int n=4;
+int tmp=0;
+int temp=0;
+int fileval=0;
+int line=35;
+FILE *file;
+char filetext[line][9000];
+char* filetext1[10000];
+char* filename[10000];
+char line1[10000];
+double time1, time2;
+pairing_t pairing;
+pbc_demo_pairing_init(pairing, argc, argv);
+if (!pairing_is_symmetric(pairing)) pbc_die("pairing must be symmetric");
+element_t g;
+element_init_G1(g, pairing);
+element_random(g);
+element_t h[q],z[q];
+for(i = 0; i < q; i++)
+			{
+				element_init_Zr(z[i], pairing);
+				element_init_G1(h[i], pairing);
+			}
+
+for(i = 0; i < q; i++)
+			{
+			    element_random(z[i]);
+			    element_pow_zn(h[i],g,z[i]);
+			}
+
+element_t hij[q][q];
+
+for(i = 0; i < q; i++)
+			{
+				for(j = 0; j < q; j++)
+                    {
+						element_init_G1(hij[i][j], pairing);
+                    }
+			}
+
+element_t temp1;
+element_init_Zr(temp1, pairing);
+
+for(i = 0; i < q; i++)
+			{
+				for(j = 0; j < q; j++)
+                    {
+						if(i!=j)
+                            {
+								element_mul(temp1,z[i],z[j]);
+								element_pow_zn(hij[i][j],g,temp1);
+						     }
+                    }
+            }
+
+	element_t P;
+	element_t Ppub, s;
+	element_init_G1(P, pairing);
+	element_init_G1(Ppub, pairing);
+	element_init_Zr(s, pairing);
+
+	element_random(P);
+	element_random(s);
+	element_mul_zn(Ppub, P, s);
+
+	element_t QID[n]; //Public Key
+	element_t SID[n]; //Secret Key
+	for(i=0;i<n;i++)
+		{
+			element_init_G1(QID[i], pairing);
+			element_init_G1(SID[i], pairing);
+		}
+
+    fileval = 0, line = 4;
+    file = fopen("E:\\userid.txt","r");
+    if (file== NULL)
+        {
+        printf("can not open file \n");
+        return 1;
+        }
+    char ID[line][9000];
+    temp=5;
+    while(fgets(ID[fileval], sizeof ID[fileval], file)!= NULL)
+    {
+		fileval++;
+    }
+fclose(file);
+
+	for(i=0;i<n;i++)
+		{
+			element_from_hash(QID[i], ID[i], strlen(ID[i]));
+			element_mul_zn(SID[i], QID[i], s);
+		}
+element_t M[q];
+element_t hom[q];
+element_t C[q];
+element_t Aux[q];
+element_t tempn;
+element_init_GT(tempn, pairing);
+for(i=0;i<q;i++)
+	{
+		element_init_G2(M[i], pairing);
+        element_init_GT(hom[i], pairing);
+		element_init_G2(C[i], pairing);
+		element_init_G2(Aux[i], pairing);
+	}
+	///
+
+
+char filepath[50][256];
+strcpy(filepath[0],"E:\\Segmentaa.txt");
+strcpy(filepath[1],"E:\\Segmentab.txt");
+strcpy(filepath[2],"E:\\Segmentac.txt");
+strcpy(filepath[3],"E:\\Segmentad.txt");
+strcpy(filepath[4],"E:\\Segmentq.txt");
+strcpy(filepath[5],"E:\\Segmenta.txt");
+strcpy(filepath[6],"E:\\Segmentz.txt");
+strcpy(filepath[7],"E:\\Segmentw.txt");
+strcpy(filepath[8],"E:\\Segments.txt");
+strcpy(filepath[9],"E:\\Segmentx.txt");
+strcpy(filepath[10],"E:\\Segmente.txt");
+strcpy(filepath[11],"E:\\Segmentd.txt");
+strcpy(filepath[12],"E:\\Segmentc.txt");
+strcpy(filepath[13],"E:\\Segmentq.txt");
+strcpy(filepath[14],"E:\\Segmenta.txt");
+strcpy(filepath[15],"E:\\Segmentz.txt");
+strcpy(filepath[16],"E:\\Segmentw.txt");
+strcpy(filepath[17],"E:\\Segments.txt");
+strcpy(filepath[18],"E:\\Segmentx.txt");
+strcpy(filepath[19],"E:\\Segmente.txt");
+strcpy(filepath[20],"E:\\Segmentd.txt");
+strcpy(filepath[21],"E:\\Segmentc.txt");
+strcpy(filepath[22],"E:\\Segmentq.txt");
+strcpy(filepath[23],"E:\\Segmenta.txt");
+strcpy(filepath[24],"E:\\Segmentz.txt");
+strcpy(filepath[25],"E:\\Segmentw.txt");
+strcpy(filepath[26],"E:\\Segments.txt");
+strcpy(filepath[27],"E:\\Segmentx.txt");
+strcpy(filepath[28],"E:\\Segmente.txt");
+strcpy(filepath[29],"E:\\Segmentd.txt");
+strcpy(filepath[30],"E:\\Segmentc.txt");
+strcpy(filepath[31],"E:\\Segmentq.txt");
+strcpy(filepath[32],"E:\\Segmenta.txt");
+strcpy(filepath[33],"E:\\Segmentz.txt");
+strcpy(filepath[34],"E:\\Segmentw.txt");
+strcpy(filepath[35],"E:\\Segments.txt");
+strcpy(filepath[36],"E:\\Segmentx.txt");
+strcpy(filepath[37],"E:\\Segmente.txt");
+strcpy(filepath[38],"E:\\Segmentd.txt");
+strcpy(filepath[39],"E:\\Segmentc.txt");
+strcpy(filepath[40],"E:\\Segmentq.txt");
+strcpy(filepath[41],"E:\\Segmenta.txt");
+strcpy(filepath[42],"E:\\Segmentz.txt");
+strcpy(filepath[43],"E:\\Segmentw.txt");
+strcpy(filepath[44],"E:\\Segments.txt");
+strcpy(filepath[45],"E:\\Segmentx.txt");
+strcpy(filepath[46],"E:\\Segmente.txt");
+strcpy(filepath[47],"E:\\Segmentd.txt");
+strcpy(filepath[48],"E:\\Segmentc.txt");
+strcpy(filepath[49],"E:\\Segmenta.txt");
+int filecounteris=0;
+for(int filecount=0;filecount<q;filecount++)
+{
+line=35;
+fileval=0;
+file = fopen(filepath[filecounteris],"r");
+if (file== NULL)
+        {
+        printf("can not open file \n");
+        return 1;
+        }
+while(fgets(filetext[fileval], sizeof filetext[fileval], file)!= NULL)
+    {
+    	fileval++;
+		tmp++;
+    }
+element_from_hash(M[filecount], filetext, strlen(filetext));
+element_from_hash(hom[filecount], filetext, strlen(filetext));
+fclose(file);
+if(filecounteris==50)
+    filecounteris=0;
+
+}
+for(i=0;i<q;i++)
+	{
+	element_pow_zn(tempn,h[i],M[i]);
+	element_set(C[i],tempn);
+	element_set(Aux[i],M[i]);
+	}
+element_t cstore[q];
+element_t tstore[q][n];
+for(i=0;i<q;i++)
+	{
+	    	element_init_GT(cstore[i], pairing);
+
+	    for(j=0;j<n;j++)
+            {
+             element_init_G1(tstore[i][j], pairing);
+
+            }
+	}
+int k=2;
+int min;
+element_t ranA;
+element_t ttemp1,ttemp2,ttemp3,ttemp4,ttemp5;
+element_init_G1(ranA, pairing);
+element_init_GT(ttemp1, pairing);
+element_init_G1(ttemp2, pairing);
+element_init_G1(ttemp3, pairing);
+element_init_GT(ttemp4, pairing);
+element_init_GT(ttemp5, pairing);
+element_t c[n+1],t[n];
+for(i=0;i<n;i++)
+	{
+		element_init_GT(c[i], pairing);
+		element_init_G1(t[i], pairing);
+	}
+element_init_GT(c[n], pairing);
+time1 = pbc_get_time();
+for(int filecount=0;filecount<q;filecount++)
+{
+printf("\nFilecount: %d ",filecount+1);
+element_random(ranA);
+element_pairing(ttemp1,ranA,P);
+i=k+1;
+element_mul_zn(c[k+1], hom[filecount], ttemp1);
+while(i!=k)
+	{
+		if(i==n)
+			i=0;
+		element_random(t[i]);
+		element_pairing(ttemp1,t[i],P);
+		element_mul(ttemp3, c[i], QID[i]);
+		element_pairing(ttemp4,ttemp3,Ppub);
+		element_mul(ttemp5, ttemp1, ttemp4);
+		element_mul(c[i+1], hom[filecount], ttemp5);
+		i++;
+	}
+element_mul(ttemp3, c[k], SID[k]);
+element_sub(t[k],ranA,ttemp3);
+for(int jval=0;jval<n;jval++)
+    {
+        element_set(tstore[filecount][jval], t[jval]);
+    }
+}
+time2 = pbc_get_time();
+printf("Signature generation time = %fs\n", time2 - time1);
+time1 = pbc_get_time();
+for(int kidnap=0;kidnap<q;kidnap++)
+{
+i=q-1;
+element_t proofi;
+element_t tempvar;
+element_t premul;
+element_init_GT(proofi, pairing);
+element_init_GT(tempvar, pairing);
+element_init_GT(premul, pairing);
+element_set1(premul);
+for(j=0;j<q;j++)
+	{
+	    if(j!=i)
+            {
+                element_pow_zn(tempvar,h[j],M[j]);
+                element_mul(premul,premul,tempvar);
+            }
+	}
+element_pow_zn(proofi,premul,z[i]);
+}
+time2 = pbc_get_time();
+printf("Query time = %fs\n", time2 - time1);
+
+//checking for file at loc loc
+int loc=8;
+element_set(c[0],cstore[loc]);
+for(i=0;i<n;i++)
+{
+    element_set(t[i],tstore[loc][i]);
+}
+time1 = pbc_get_time();
+for(i=0;i<n;i++)
+{
+if(i+1==n)
+	min=0;
+else
+	min=i+1;
+element_pairing(ttemp1,t[i],P);
+element_mul(ttemp3, c[i], QID[i]);
+element_pairing(ttemp4,ttemp3,Ppub);
+element_mul(ttemp5, ttemp1, ttemp4);
+element_mul(c[min], hom[loc], ttemp5);
+}
+time2 = pbc_get_time();
+if (!element_cmp(c[0], c[n]))
+    {
+        temp=5;
+	}
+if(temp==5)
+{
+    printf("Check");
+}
+else
+{
+    printf("Invalid");
+}
+printf("Verification time = %fs\n", time2 - time1);
+
+}

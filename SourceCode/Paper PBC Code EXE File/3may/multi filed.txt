@@ -1,0 +1,56 @@
+#include <pbc.h>
+#include <pbc_test.h>
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+int i,j;
+int q=10;
+int n=4;
+int tmp=0;
+int temp=0;
+int fileval;
+int line=35;
+FILE *file;
+char filetext[line][9000];
+char* filetext1[10000];
+char* filename[10000];
+char line1[10000];
+double time1, time2;
+pairing_t pairing;
+pbc_demo_pairing_init(pairing, argc, argv);
+if (!pairing_is_symmetric(pairing)) pbc_die("pairing must be symmetric");
+
+
+//Now read file one by one
+char filepath[50][256];
+strcpy(filepath[0],"E:\\Segmentaa.txt");
+strcpy(filepath[1],"E:\\Segmentab.txt");
+strcpy(filepath[2],"E:\\Segmentac.txt");
+strcpy(filepath[3],"E:\\Segmentad.txt");
+
+
+for(int filecount=0;filecount<4;filecount++)
+{
+//printf("FILE at %d ",filecount+1);
+line=35;
+fileval=0;
+printf("Opening ");
+file = fopen(filepath[filecount],"r");
+if (file== NULL)
+        {
+        printf("can not open file \n");
+        return 1;
+        }
+while(fgets(filetext[fileval], sizeof filetext[fileval], file)!= NULL)
+    {
+        printf("%s ",filetext[fileval]);
+		fileval++;
+		tmp++;
+    }
+fclose(file);
+ printf("\n\n >>>>>>>>>>>>>>>>>>> ");
+}
+}
+
+

@@ -1,0 +1,255 @@
+#include <pbc.h>
+#include <pbc_test.h>
+
+int main(int argc, char **argv)
+{
+int i,j;
+int q=20;
+int n=4;
+int k=2;
+int tmp=0;
+int fileval=0;
+int line=35;
+pairing_t pairing;
+pbc_demo_pairing_init(pairing, argc, argv);
+if (!pairing_is_symmetric(pairing)) pbc_die("pairing must be symmetric");
+FILE *file;
+char filetext[line][9000];
+char* filename[10000];
+double time1, time2;
+file = fopen("E:\Segmentaa.txt","r");
+if (file== NULL)
+        {
+        printf("can not open file \n");
+        return 1;
+        }
+while(fgets(filetext[fileval], sizeof filetext[fileval], file)!= NULL)
+    {
+		fileval++;
+		tmp++;
+    }
+fclose(file);
+element_t g;
+element_init_G1(g, pairing);
+element_random(g);
+element_t h[q+1],z[q+1];
+for(i = 0; i < q+1; i++)
+			{
+				element_init_Zr(z[i], pairing);
+				element_init_G1(h[i], pairing);
+			}
+
+for(i = 0; i < q+1; i++)
+			{
+			    element_random(z[i]);
+			    element_pow_zn(h[i],g,z[i]);
+			}
+
+element_t hij[q+1][q+1];
+
+for(i = 0; i < q+1; i++)
+			{
+				for(j = 0; j < q+1; j++)
+                    {
+						element_init_G1(hij[i][j], pairing);
+                    }
+			}
+
+element_t temp1;
+element_init_Zr(temp1, pairing);
+
+for(i = 0; i < q+1; i++)
+			{
+				for(j = 0; j < q+1; j++)
+                    {
+						if(i!=j)
+                            {
+								element_mul(temp1,z[i],z[j]);
+								element_pow_zn(hij[i][j],g,temp1);
+						     }
+                    }
+            }
+
+	element_t P;
+	element_t Ppub, s;
+	element_init_G1(P, pairing);
+	element_init_G1(Ppub, pairing);
+	element_init_Zr(s, pairing);
+
+	element_random(P);
+	element_random(s);
+	element_mul_zn(Ppub, P, s);
+
+	element_t QID[n]; //Public Key
+	element_t SID[n]; //Secret Key
+	for(i=0;i<n;i++)
+		{
+			element_init_G1(QID[i], pairing);
+			element_init_G1(SID[i], pairing);
+		}
+
+    fileval = 0, line = 4;
+    file = fopen("E:\myid.txt","r");
+    if (file== NULL)
+        {
+        printf("can not open file \n");
+        return 1;
+        }
+    char ID[line][9000];
+    while(fgets(ID[fileval], sizeof ID[fileval], file)!= NULL)
+    {
+		fileval++;
+    }
+fclose(file);
+
+	for(i=0;i<n;i++)
+		{
+			element_from_hash(QID[i], ID[i], strlen(ID[i]));
+			element_mul_zn(SID[i], QID[i], s);
+		}
+element_t M[q+1];
+element_t C[q+1];
+element_t Aux[q+1];
+element_t tempn;
+element_init_GT(tempn, pairing);
+for(i=0;i<q+1;i++)
+	{
+		element_init_G2(M[i], pairing);
+		element_init_G2(C[i], pairing);
+		element_init_G2(Aux[i], pairing);
+	}
+for(i=0;i<q;i++)
+	{
+	element_random(M[i]);
+	element_pow_zn(tempn,h[i],M[i]);
+	element_set(C[i],tempn);
+	element_set(Aux[i],M[i]);
+	}
+/*
+i=0;
+j=0;
+char* filetext[10000];
+char* filename[10000];
+char line[10000];
+FILE *file;
+file = fopen("E:\filenames.txt", "r");
+while(fgets(line1, sizeof line1, file)!=NULL)
+    {
+        filename[i]=line;
+        i++;
+    }
+fclose(file);
+for(int ti=0;ti<q;ti++)
+    {
+        i=0;
+        j=0;
+        file = fopen(filename[ti], "r");
+        while(fgets(line1, sizeof line1, file)!=NULL)
+            {
+            filetext1[i]=line;
+            i++;
+            }
+        fclose(file);
+        element_from_hash(M[ti], filetext1, strlen(filetext1));
+    }
+
+
+
+    for(i=0;i<q;i++)
+        {
+        element_pow_zn(tempn,h[i],M[i]);
+        element_set(C[i],tempn);
+        element_set(Aux[i],M[i]);
+        }
+	*/
+
+element_from_hash(M[q], filetext, strlen(filetext));
+element_pow_zn(tempn,h[q],M[q]);
+element_set(C[q],tempn);
+element_set(Aux[q],M[q]);
+///
+k=2;
+int min;
+element_t ranA;
+element_t ttemp1,ttemp2,ttemp3,ttemp4,ttemp5;
+element_init_G1(ranA, pairing);
+element_init_GT(ttemp1, pairing);
+element_init_G1(ttemp2, pairing);
+element_init_G1(ttemp3, pairing);
+element_init_GT(ttemp4, pairing);
+element_init_GT(ttemp5, pairing);
+element_t hom;
+element_init_GT(hom, pairing);
+element_t c[n+1],t[n];
+for(i=0;i<n;i++)
+	{
+		element_init_GT(c[i], pairing);
+		element_init_G1(t[i], pairing);
+	}
+element_init_GT(c[n], pairing);
+element_random(ranA);
+element_pairing(ttemp1,ranA,P);
+element_from_hash(hom, filetext, strlen(filetext));
+i=k+1;
+time1 = pbc_get_time();
+element_mul_zn(c[k+1], hom, ttemp1);
+while(i!=k)
+	{
+		if(i==n)
+			i=0;
+		element_random(t[i]);
+		element_pairing(ttemp1,t[i],P);
+		element_mul(ttemp3, c[i], QID[i]);
+		element_pairing(ttemp4,ttemp3,Ppub);
+		element_mul(ttemp5, ttemp1, ttemp4);
+		element_mul(c[i+1], hom, ttemp5);
+		i++;
+	}
+element_mul(ttemp3, c[k], SID[k]);
+element_sub(t[k],ranA,ttemp3);
+time2 = pbc_get_time();
+printf("Signature generation time = %fs\n", time2 - time1);
+i=q;
+element_t proofi;
+element_t tempvar;
+element_t premul;
+element_init_GT(proofi, pairing);
+element_init_GT(tempvar, pairing);
+element_init_GT(premul, pairing);
+element_set1(premul);
+for(j=0;j<q+1;j++)
+	{
+	    if(j!=i)
+            {
+                element_pow_zn(tempvar,h[j],M[j]);
+                element_mul(premul,premul,tempvar);
+            }
+	}
+element_pow_zn(proofi,premul,z[i]);
+element_t homn;
+element_init_GT(homn, pairing);
+element_from_hash(homn, filetext, strlen(filetext));
+time1 = pbc_get_time();
+for(i=0;i<n;i++)
+{
+if(i+1==n)
+	min=0;
+else
+	min=i+1;
+element_pairing(ttemp1,t[i],P);
+element_mul(ttemp3, c[i], QID[i]);
+element_pairing(ttemp4,ttemp3,Ppub);
+element_mul(ttemp5, ttemp1, ttemp4);
+element_mul(c[min], homn, ttemp5);
+}
+time2 = pbc_get_time();
+if (!element_cmp(c[0], c[n]))
+    {
+        printf("Proof valid\n");
+	}
+else
+    {
+		printf("Verification failed\n");
+	}
+printf("Verification time = %fs\n", time2 - time1);
+}

@@ -1,0 +1,31 @@
+#include <pbc.h>
+#include <pbc_test.h>
+
+int main(int argc, char **argv)
+{
+int i = 0, line = 35;
+FILE *myfile;
+myfile = fopen("E:\Segmentaa.txt","r");
+if (myfile== NULL)
+    {
+    printf("can not open file \n");
+    return 1;
+    }
+char ln[35][9000];
+for(int i = 0; i < 35; ++i)
+{
+  if(fgets(ln[i], sizeof ln[i], myfile) == NULL)
+  {
+    fprintf(stderr, "Read error on line %d\n", i);
+    exit(1);
+  }
+  else
+  {
+      printf("%s", ln[i]);
+
+  }
+}
+    fclose(myfile);
+
+    return 0;
+}

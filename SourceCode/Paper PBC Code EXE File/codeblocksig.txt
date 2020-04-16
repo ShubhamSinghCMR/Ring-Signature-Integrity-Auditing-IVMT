@@ -1,0 +1,270 @@
+#include <pbc.h>
+#include <pbc_test.h>
+
+int main(int argc, char **argv)
+{
+int i,j;
+pairing_t pairing;
+pbc_demo_pairing_init(pairing, argc, argv);
+if (!pairing_is_symmetric(pairing)) pbc_die("pairing must be symmetric");
+int q=5;
+int n=5; // n is the number of users in the group
+element_t g,A[n],X[n],gsk[n][2],grt[n],gpk[3],Y,W,temp2,temp3;
+element_t r,ucap,vcap;
+element_t alpha;
+element_t u,v;
+element_t T1,T2;
+element_t tempnew;
+element_t delsym;
+element_t ralpha,rx,rdel;
+element_t R1,R2,R3,p1,p2,p3,te1,te2,te3;
+element_t revn;
+element_t revn2;
+element_t mktemp;
+element_t nte1,nte2;
+element_t c;
+element_t nte3,nte4,nte5,salpha,sx,sdel;
+element_t Sig[7];
+element_init_G1(g, pairing);
+element_random(g);
+element_printf("g %B\n", g);
+
+element_t h[q],z[q];
+for(i = 0; i < q; i++)
+			{
+				element_init_Zr(z[i], pairing);
+				element_init_G1(h[i], pairing);
+			}
+for(i = 0; i < q; i++)
+			{
+			    element_random(z[i]);
+			    element_printf("ZVAL %B\n",z[i] );
+			    element_pow_zn(h[i],g,z[i]);
+				element_printf("hval %B\n", h[i]);
+			}
+element_t hij[q][q];
+for(i = 0; i < q; i++)
+			{
+				for(j = 0; j < q; j++)
+                    {
+						element_init_G1(hij[i][j], pairing);
+                    }
+
+			}
+element_t temp1;
+element_init_Zr(temp1, pairing);
+for(i = 0; i < q; i++)
+			{
+				for(j = 0; j < q; j++)
+                    {
+						if(i!=j)
+                            {
+								element_mul(temp1,z[i],z[j]);
+								element_pow_zn(hij[i][j],g,temp1);
+								element_printf("hij %B\n", hij[i][j]);
+                            }
+                    }
+            }
+
+        element_t g1,g2;
+    	element_init_G2(g2, pairing);
+		element_init_G1(g1, pairing);
+		element_random(g2);
+
+        element_init_same_as(g1,g2);
+		element_random(g1);
+		element_printf("g1 %B\n", g1);
+		element_printf("g2 %B\n", g2);
+
+		element_init_Zr(Y, pairing);
+		element_random(Y);
+		element_printf("y %B\n", Y);
+
+		element_init_G2(W, pairing);
+		element_pow_zn(W,g2,Y);
+		element_printf("w %B\n", W);
+
+		for(i=0;i<n;i++)
+		{
+			element_init_Zr(X[i], pairing);
+			element_init_G1(A[i], pairing);
+			element_init_G1(gsk[i][0], pairing);
+			element_init_G1(gsk[i][1], pairing);
+			element_init_G1(grt[i], pairing);
+			element_init_G1(gpk[0], pairing);
+			element_init_G1(gpk[1], pairing);
+			element_init_G1(gpk[2], pairing);
+		}
+
+		element_init_Zr(temp2, pairing);
+		element_init_Zr(temp3, pairing);
+		for(i=0;i<n;i++)
+			{
+			    element_random(temp2);
+				element_set(X[i],temp2);
+				element_add(temp2,Y,temp2);
+				printf("While");
+				while((element_is0(temp2)))
+					{
+						element_random(temp2);
+						element_add(temp2,Y,temp2);
+					}
+					element_set(X[i],temp2);
+				element_invert(temp3,temp2);
+				element_pow_zn(A[i],g1,temp3);
+				element_printf("Ai %B\n", A[i]);
+
+				element_set(gsk[i][0],A[i]);
+				element_printf("gsk[i][0] %B\n", gsk[i][0]);
+
+				element_set(gsk[i][1],X[i]);
+				element_printf("gsk[i][1] %B\n", gsk[i][1]);
+				element_set(grt[i],A[i]);
+				element_printf("grt[i] %B\n", grt[i]);
+			}
+		element_set(gpk[0],g1);
+		element_printf("gpk[0][1] %B\n", gpk[0]);
+		element_set(gpk[1],g2);
+		element_printf("gpk[1][1] %B\n", gpk[1]);
+		element_set(gpk[2],W);
+		element_printf("gpk[2][1] %B\n", gpk[2]);
+        int  line = 5;
+        i=0;
+        j=0;
+        int l=0;
+        char chfull[50][100];
+        FILE *myfile;
+        myfile = fopen("mytext.txt","r");
+        if (myfile== NULL)
+            {
+                printf("can not open file \n");
+            }
+        while(line--)
+                {
+                    fscanf(myfile,"%s",chfull[j]);
+                    printf("\n%s", chfull[j]);
+                    i++;
+                    j++;
+                    l++;
+                }
+        while(j<l)
+            {
+                printf("THE FILE DATA IS: \n%s", chfull[j]);
+                j++;
+            }
+        fclose(myfile);
+        element_t M[q];
+        element_t C[q];
+        element_t Aux[q];
+        element_t tempn;
+        element_init_GT(tempn, pairing);
+        for(i=0;i<q;i++)
+            {
+                    element_init_G2(M[i], pairing);
+                    element_init_G2(C[i], pairing);
+                    element_init_G2(Aux[i], pairing);
+            }
+        for(i=0;i<q;i++)
+            {
+                element_random(M[i]);
+                element_pow_zn(tempn,h[i],M[i]);
+                element_set(C[i],tempn);
+                element_set(Aux[i],M[i]);
+                element_printf("Aux %B\n", Aux[i]);
+                element_printf("M %B\n", M[i]);
+            }
+    i=1;
+    element_init_Zr(r, pairing);
+	element_random(r);
+    element_init_G2(ucap, pairing);
+	element_init_G2(vcap, pairing);
+    element_init_G2(u, pairing);
+	element_init_G2(v, pairing);
+    element_init_same_as(u,ucap);
+	element_random(u);
+    element_init_same_as(v,vcap);
+	element_random(v);
+    element_init_Zr(alpha, pairing);
+	element_random(alpha);
+    element_init_G2(T1, pairing);
+	element_init_G2(T2, pairing);
+    element_init_G2(tempnew, pairing);
+    element_init_same_as(r,T1);
+    element_pow_zn(T1,u,alpha);
+	element_pow_zn(tempnew,v,alpha);
+    element_init_G2(delsym, pairing);
+    element_mul(T2,A[i],tempnew);
+	element_mul(delsym,X[i],alpha);
+    element_init_G2(ralpha, pairing);
+	element_init_G2(rx, pairing);
+	element_init_G2(rdel, pairing);
+    element_random(r);
+    element_random(ralpha);
+    element_random(rx);
+	element_random(rdel);
+    element_init_G2(R1, pairing);
+	element_init_G2(R2, pairing);
+	element_init_G2(R3, pairing);
+	element_init_GT(p1, pairing);
+	element_init_GT(p2, pairing);
+	element_init_GT(p3, pairing);
+	element_init_G2(te1, pairing);
+	element_init_G2(te2, pairing);
+	element_init_G2(te3, pairing);
+	element_pow_zn(R1,u,ralpha);
+	element_pairing(p1,T2,g2);
+	element_pow_zn(te1,p1,rx);
+	element_pairing(p2,v,W);
+	element_init_G2(revn, pairing);
+	element_neg(revn,ralpha);
+	element_pow_zn(te2,p2,revn);
+	element_pairing(p3,v,g2);
+	element_init_G2(revn2, pairing);
+	element_neg(revn2,rdel);
+	element_pow_zn(te3,p3,revn2);
+	element_init_G2(mktemp, pairing);
+    element_mul(mktemp,te1,te2);
+	element_mul(R2,mktemp,te3);
+    element_init_G2(nte1, pairing);
+	element_init_G2(nte2, pairing);
+    element_pow_zn(nte1,T1,rx);
+	element_pow_zn(nte2,u,revn2);
+	element_mul(R3,nte1,nte2);
+    element_init_Zr(c, pairing);
+    element_init_G2(nte3, pairing);
+	element_init_G2(nte4, pairing);
+	element_init_G2(nte5, pairing);
+	element_init_G2(salpha, pairing);
+	element_init_G2(sx, pairing);
+	element_init_G2(sdel, pairing);
+	element_init_same_as(c,T1);
+	element_random(c);
+	element_mul(nte3,c,alpha);
+	element_mul(nte4,c,delsym);
+	element_mul(nte5,c,X[i]);
+	element_add(salpha,ralpha,nte3);
+	element_add(sx,rx,nte5);
+	element_add(sdel,rdel,nte4);
+    for(i = 0; i < 7; i++)
+			{
+				element_init_G2(Sig[i], pairing);
+			}
+    element_set(Sig[0], r);
+	element_set(Sig[1], T1);
+	element_set(Sig[2], T2);
+	element_set(Sig[3], c);
+	element_set(Sig[4], salpha);
+	element_set(Sig[5], sx);
+	element_set(Sig[6], sdel);
+    element_printf("Signature setc\n");
+    element_printf("%B 0\n",Sig[0]);
+    element_printf("%B 1\n",Sig[1]);
+    element_printf("%B 2\n",Sig[2]);
+    element_printf("%B 3\n",Sig[3]);
+    element_printf("%B 4\n",Sig[4]);
+    element_printf("%B 5\n",Sig[5]);
+    element_printf("%B 6\n",Sig[6]);
+
+
+
+}
